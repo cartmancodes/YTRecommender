@@ -3,7 +3,7 @@ Driver script
 """
 
 from optparse import OptionParser
-
+from content_getter import ContentGetter
 
 def get_opts():
     """Setup metod for OptionParser"""
@@ -25,5 +25,6 @@ def get_opts():
 
 if __name__ == "__main__":
     opts = get_opts()
-    print(opts.content)
+    cg = ContentGetter(opts)
+    cg.get_content()
     
