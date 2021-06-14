@@ -1,14 +1,13 @@
 """
 Primary Validator module
 """
-import requests
 from youtubesearchpython import VideosSearch
 from bs4 import BeautifulSoup
 from content_scraper import scrape_content
 
 # Monkey patching code 
-# import ssl
-# ssl._create_default_https_context = ssl._create_unverified_context
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 class ContentGetter:
     def __init__(self, opts):
@@ -23,7 +22,10 @@ class ContentGetter:
         return VideosSearch(self.content, limit=self.pages)
 
     def prune_content(self, contents):
-        interested_contents = [scrape_content(content['link'] for content in contents)]
+        interested_contents = []
+        for content in contents:
+            if(scrape_content(content['link'])):
+                interested_contents.append(content['link'])
         return interested_contents
 
 

@@ -8,7 +8,7 @@ from content_getter import ContentGetter
 def get_opts():
     """Setup metod for OptionParser"""
 
-    usage = "usage: %prog -c 'chill indie music' -p 100"
+    usage = "usage: %prog -c 'chill indie music' -p 10"
     parser = OptionParser(usage)
 
     parser.add_option("-c", "--content", dest="content",
@@ -26,5 +26,7 @@ def get_opts():
 if __name__ == "__main__":
     opts = get_opts()
     cg = ContentGetter(opts)
-    cg.get_content()
+    content_list = cg.get_content()
+    print("Content List: ")
+    print(content_list)
     
