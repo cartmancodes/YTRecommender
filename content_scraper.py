@@ -14,7 +14,7 @@ def scrape_content(URL):
     session = HTMLSession()
     response = session.get(URL)
     # Execute the JS in the page
-    response.html.render(sleep=20)
+    response.html.render(sleep=1,timeout=20)
 
     soup = bs(response.html.html, "html.parser")
     text_yt_formatted_strings = soup.find_all("yt-formatted-string", {"id": "text", "class": "ytd-toggle-button-renderer"})
