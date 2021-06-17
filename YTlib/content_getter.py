@@ -21,11 +21,10 @@ class ContentGetter:
     def search_content(self):
         return VideosSearch(self.content, limit=self.pages)
 
-    def prune_content(self, contents):
-        interested_contents = []
-        for content in contents:
-            if(scrape_content(content['link'])):
-                interested_contents.append(content['link'])
-        return interested_contents
+    def prune_content(self, contents):        
+        urls = [content['link'] for content in contents]
+        return scrape_content(urls)
+
+
 
 
