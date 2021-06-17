@@ -11,12 +11,15 @@ def scrape_content(urls):
     """
     Method to validate a URLs based on certain criterias
     """
-    interested_urls= []
+    interested_urls, interested_responses = [], []
     for url in urls:        
         session = HTMLSession()
         response = session.get(url)
         # Execute the JS in the page
         response.html.render(sleep=2,timeout=20)
+        interested_responses.append(response)
+
+    for response in interested_responses:
         if validate_content(response, url):
             interested_urls.append(urls)
     
