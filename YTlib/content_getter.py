@@ -1,6 +1,7 @@
 """
 Primary Validator module
 """
+import asyncio
 from youtubesearchpython import VideosSearch
 from bs4 import BeautifulSoup
 from content_scraper import scrape_content
@@ -23,8 +24,8 @@ class ContentGetter:
 
     def prune_content(self, contents):        
         urls = [content['link'] for content in contents]
-        return scrape_content(urls)
-
+        return asyncio.run(scrape_content(urls))
+        #return scrape_content(urls)
 
 
 
