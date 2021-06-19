@@ -3,7 +3,7 @@ Primary Scraping module
 """
 from asyncio import tasks
 from asyncio.events import get_event_loop
-from requests_html import AsyncHTMLSession 
+from requests_html import AsyncHTMLSession
 from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup as bs
 import time
@@ -13,9 +13,7 @@ MIN_VIEWS = 10000
 LIKE_FACTOR = 100
 
 def scrape_content(urls):
-
     interested_contents = []
-
     response_list = asyncio.run(get_tasks(urls))
 
     for response, url in response_list:
@@ -30,14 +28,16 @@ async def get_tasks(urls):
     """
     session = AsyncHTMLSession()
     tasks = [fetch_url(session, url) for url in urls]
+    content_list = await asyncio.gather(*tasks)
+    print("started: ")
     await session.close()
-    return await asyncio.gather(*tasks)
+    return content_list
 
 
 async def fetch_url(session, url):
     print("Fetch URL invocated for url: {}".format(url))
     response = await session.get(url)
-    await response.html.arender(timeout=10)
+    await response.html.arender(timeout=25)
     print("Fetching done")
     return (response, url)
 
