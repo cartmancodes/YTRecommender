@@ -7,4 +7,4 @@ class ContentScraper(unittest.TestCase):
         self.assertIsNotNone(op)
 
 if __name__ == "__main__":
-    await unittest.main()
+    unittest.main()

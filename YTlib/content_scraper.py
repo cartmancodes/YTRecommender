@@ -13,19 +13,16 @@ MIN_VIEWS = 10000
 LIKE_FACTOR = 100
 
 def scrape_content(urls):
-    interested_contents = []
     # Asyncio's run() does'nt play well with request-html's arender(), hence use event loops
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(get_tasks(urls))
     response_list = loop.run_until_complete(future)
-
-    for response, url in response_list:
-        if validate_content(response, url):
-            interested_contents.append(url)
-
+    interested_contents = [validate_content(response, url) for response, url in response_list]
+    interested_contents = list(filter(None, interested_contents))
     # Check and close event loops explicitly
     if loop.is_running():
         loop.close()
+
     return interested_contents
 
 async def get_tasks(urls):
@@ -33,13 +30,13 @@ async def get_tasks(urls):
     Method to validate a URLs based on certain criterias
     """
     session = AsyncHTMLSession()
-    tasks = [fetch_url(session, url) for url in urls]
+    tasks = [get_response(session, url) for url in urls]
     content_list = await asyncio.gather(*tasks)
     await session.close()
     return content_list
 
 
-async def fetch_url(session, url):
+async def get_response(session, url):
     print("Fetching initiated for url: {}".format(url))
     response = await session.get(url)
     await response.html.arender(timeout=25)
@@ -55,7 +52,7 @@ def validate_content(response, url):
         dislikes = int(''.join([char for char in text_yt_formatted_strings[1].attrs.get("aria-label") if char.isdigit()]))
         
         print("URL: {},Views: {}, Likes: {}, Dislikes: {}".format(url, views, likes, dislikes))
-        return True if (views >= MIN_VIEWS and likes >= LIKE_FACTOR*dislikes) else False
+        return url if (views >= MIN_VIEWS and likes >= LIKE_FACTOR*dislikes) else None
 
     except Exception as e:
         print("Scraping did'nt work for: {} because of error: {}".format(url, e))

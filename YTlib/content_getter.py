@@ -25,7 +25,7 @@ class ContentGetter:
     def prune_content(self, contents):        
         urls = [content['link'] for content in contents]
         return scrape_content(urls)
-        #return scrape_content(urls)
+
 
 
 
