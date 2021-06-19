@@ -35,7 +35,6 @@ async def get_tasks(urls):
     await session.close()
     return content_list
 
-
 async def get_response(session, url):
     print("Fetching initiated for url: {}".format(url))
     response = await session.get(url)
@@ -50,9 +49,8 @@ def validate_content(response, url):
         views = int(''.join([char for char in soup.find("span", attrs={"class": "view-count"}).text if char.isdigit()]))
         likes = int(''.join([char for char in text_yt_formatted_strings[0].attrs.get("aria-label") if char.isdigit()]))
         dislikes = int(''.join([char for char in text_yt_formatted_strings[1].attrs.get("aria-label") if char.isdigit()]))
-        
         print("URL: {},Views: {}, Likes: {}, Dislikes: {}".format(url, views, likes, dislikes))
+        
         return url if (views >= MIN_VIEWS and likes >= LIKE_FACTOR*dislikes) else None
-
     except Exception as e:
         print("Scraping did'nt work for: {} because of error: {}".format(url, e))
