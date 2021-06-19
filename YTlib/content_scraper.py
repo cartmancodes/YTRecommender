@@ -4,6 +4,7 @@ Primary Scraping module
 from asyncio import tasks
 from asyncio.events import get_event_loop
 from requests_html import AsyncHTMLSession 
+from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup as bs
 import time
 import asyncio
@@ -11,34 +12,32 @@ import asyncio
 MIN_VIEWS = 10000
 LIKE_FACTOR = 100
 
-async def scrape_content(urls):
+def scrape_content(urls):
+
+    # op = []
+    # for response in interested_responses:
+    #         if validate_content(response, "URL"):
+    #             op.append(urls)
+        
+    op = asyncio.run(get_tasks(urls))
+    return op
+
+async def get_tasks(urls):
     """
     Method to validate a URLs based on certain criterias
     """
-    interested_urls, interested_responses, tasks = [], [], []
-    start_time = time.time()
-    
-    loop = asyncio.get_event_loop()
-    for url in urls:        
-        tasks.append(loop.create_task(fetch_url(url)))
-    loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
-
-    for response in interested_responses:
-        if validate_content(response, url):
-            interested_urls.append(urls)
-    
-    end_time = time.time()
-    print("Time Taken: " + str(end_time - start_time))
-    return interested_urls
-
-
-async def fetch_url(url):
-    print("Fetch URL invocsted for url: {}".format(url))
     session = AsyncHTMLSession()
+    tasks = [fetch_url(session, url) for url in urls]
+    await session.close()
+    return await asyncio.gather(*tasks)
+
+
+async def fetch_url(session, url):
+    print("Fetch URL invocated for url: {}".format(url))
     response = await session.get(url)
-    # Execute JS in the page
-    return await response.html.render(asyncio.sleep(2), timeout=20)
+    await response.html.arender(timeout=10)
+    print("Fetching done")
+    return response
 
 def validate_content(response, url):
     soup = bs(response.html.html, "html.parser")
