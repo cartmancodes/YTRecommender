@@ -27,6 +27,6 @@ if __name__ == "__main__":
     opts = get_opts()
     cg = ContentGetter(opts)
     content_list = cg.get_content()
-    print("Content List: ")
+    print("Quality Content List: ")
     print(content_list)
     
