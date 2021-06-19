@@ -14,13 +14,15 @@ LIKE_FACTOR = 100
 
 def scrape_content(urls):
 
-    # op = []
-    # for response in interested_responses:
-    #         if validate_content(response, "URL"):
-    #             op.append(urls)
-        
-    op = asyncio.run(get_tasks(urls))
-    return op
+    interested_contents = []
+
+    response_list = asyncio.run(get_tasks(urls))
+
+    for response, url in response_list:
+        if validate_content(response, url):
+            interested_contents.append(url)
+
+    return interested_contents
 
 async def get_tasks(urls):
     """
@@ -37,7 +39,7 @@ async def fetch_url(session, url):
     response = await session.get(url)
     await response.html.arender(timeout=10)
     print("Fetching done")
-    return response
+    return (response, url)
 
 def validate_content(response, url):
     soup = bs(response.html.html, "html.parser")
