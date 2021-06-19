@@ -1,6 +1,7 @@
 """
 Primary Validator module
 """
+import asyncio
 from youtubesearchpython import VideosSearch
 from bs4 import BeautifulSoup
 from content_scraper import scrape_content
