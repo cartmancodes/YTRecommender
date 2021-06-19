@@ -38,7 +38,8 @@ async def get_tasks(urls):
 async def get_response(session, url):
     print("Fetching initiated for url: {}".format(url))
     response = await session.get(url)
-    await response.html.arender(timeout=25)
+    # Render JS code 
+    await response.html.arender(sleep=2,timeout=30)
     print("Fetching completed for url: {}".format(url))
     return (response, url)
 
@@ -46,11 +47,19 @@ def validate_content(response, url):
     soup = bs(response.html.html, "html.parser")
     text_yt_formatted_strings = soup.find_all("yt-formatted-string", {"id": "text", "class": "ytd-toggle-button-renderer"})
     try:
+        like_index = get_like_index(text_yt_formatted_strings)
         views = int(''.join([char for char in soup.find("span", attrs={"class": "view-count"}).text if char.isdigit()]))
-        likes = int(''.join([char for char in text_yt_formatted_strings[0].attrs.get("aria-label") if char.isdigit()]))
-        dislikes = int(''.join([char for char in text_yt_formatted_strings[1].attrs.get("aria-label") if char.isdigit()]))
+        likes = int(''.join([char for char in text_yt_formatted_strings[like_index].attrs.get("aria-label") if char.isdigit()]))
+        dislikes = int(''.join([char for char in text_yt_formatted_strings[like_index + 1].attrs.get("aria-label") if char.isdigit()]))
         print("URL: {},Views: {}, Likes: {}, Dislikes: {}".format(url, views, likes, dislikes))
         
         return url if (views >= MIN_VIEWS and likes >= LIKE_FACTOR*dislikes) else None
     except Exception as e:
         print("Scraping did'nt work for: {} because of error: {}".format(url, e))
+
+def get_like_index(yt_strings):
+    """
+    Likes tab is generally present at 0th index but for some videos it's present at 1st index, 
+    dislike is followed by it always , handling this accordingly :)
+    """
+    return 0 if "likes" in str(yt_strings[0]) else 1
