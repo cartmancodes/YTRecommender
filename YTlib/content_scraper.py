@@ -14,12 +14,18 @@ LIKE_FACTOR = 100
 
 def scrape_content(urls):
     interested_contents = []
-    response_list = asyncio.run(get_tasks(urls))
+    # Asyncio's run() does'nt play well with request-html's arender(), hence use event loops
+    loop = asyncio.get_event_loop()
+    future = asyncio.ensure_future(get_tasks(urls))
+    response_list = loop.run_until_complete(future)
 
     for response, url in response_list:
         if validate_content(response, url):
             interested_contents.append(url)
 
+    # Check and close event loops explicitly
+    if loop.is_running():
+        loop.close()
     return interested_contents
 
 async def get_tasks(urls):
@@ -29,16 +35,15 @@ async def get_tasks(urls):
     session = AsyncHTMLSession()
     tasks = [fetch_url(session, url) for url in urls]
     content_list = await asyncio.gather(*tasks)
-    print("started: ")
     await session.close()
     return content_list
 
 
 async def fetch_url(session, url):
-    print("Fetch URL invocated for url: {}".format(url))
+    print("Fetching initiated for url: {}".format(url))
     response = await session.get(url)
     await response.html.arender(timeout=25)
-    print("Fetching done")
+    print("Fetching completed for url: {}".format(url))
     return (response, url)
 
 def validate_content(response, url):
