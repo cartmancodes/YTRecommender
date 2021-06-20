@@ -39,7 +39,7 @@ async def get_response(session, url):
     print("Fetching initiated for url: {}".format(url))
     response = await session.get(url)
     # Render JS code 
-    await response.html.arender(sleep=2,timeout=30)
+    await response.html.arender(sleep=4,timeout=30)
     print("Fetching completed for url: {}".format(url))
     return (response, url)
 
