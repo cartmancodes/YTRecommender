@@ -26,9 +26,7 @@ def scrape_content(urls):
     return interested_contents
 
 async def get_tasks(urls):
-    """
-    Method to validate a URLs based on certain criterias
-    """
+    """Method to validate a URLs based on certain criterias"""
     session = AsyncHTMLSession()
     tasks = [get_response(session, url) for url in urls]
     content_list = await asyncio.gather(*tasks)
