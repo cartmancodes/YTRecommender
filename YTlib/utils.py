@@ -11,7 +11,7 @@ def timer(func):
     """Decorator for timer utility"""
     @wraps(func)
     async def wrapper(*args, **kwargs):
-        print("Fetchig started for {}".format(args[1]))
+        print("Fetching started for {}".format(args[1]))
         output =  await func(*args, **kwargs)
         print("Fetching ended for {}".format(args[1]))
         return output
