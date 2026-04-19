@@ -18,45 +18,13 @@
 
 ## Setup
 
-### Option A — `pyproject.toml` (recommended)
-
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate        # macOS / Linux
 # .venv\Scripts\activate         # Windows
 
-pip install -e .                 # installs ytscraper as a command
+pip install -e .                 # installs ytscraper as a shell command
 pip install -e ".[dev]"          # also installs pytest
-```
-
-After this, `ytscraper` is available as a shell command:
-
-```bash
-ytscraper -c "lo-fi beats" --top 5
-```
-
-### Option B — `uv` (faster, no venv needed)
-
-[`uv`](https://github.com/astral-sh/uv) is a fast Python package manager that manages its own virtual environment:
-
-```bash
-# Install uv (once)
-curl -LsSf https://astral.sh/uv/install.sh | sh   # Linux / macOS
-# winget install astral-sh.uv                      # Windows
-
-# Run directly — uv handles the venv and deps automatically
-uv run python -m ytscraper -c "lo-fi beats" --top 5
-
-# Or install into a uv-managed environment
-uv pip install -e ".[dev]"
-```
-
-### Option C — `requirements.txt` (classic)
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
 ```
 
 ---
@@ -64,11 +32,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-# If installed via pyproject.toml (Option A or B)
 ytscraper -c "<search query>" [options]
-
-# If installed via requirements.txt (Option C)
-python -m ytscraper -c "<search query>" [options]
 ```
 
 ### Options
@@ -90,13 +54,13 @@ python -m ytscraper -c "<search query>" [options]
 ### Basic search
 
 ```bash
-python -m ytscraper -c "chill indie playlist" -p 20
+ytscraper -c "chill indie playlist" -p 20
 ```
 
 ### Limit results
 
 ```bash
-python -m ytscraper -c "lo-fi beats" -p 15 --top 5
+ytscraper -c "lo-fi beats" -p 15 --top 5
 ```
 
 ```
@@ -111,13 +75,13 @@ python -m ytscraper -c "lo-fi beats" -p 15 --top 5
 ### Custom quality thresholds
 
 ```bash
-python -m ytscraper -c "jazz piano" -p 20 --min-views 50000 --min-like-ratio 200 --top 10
+ytscraper -c "jazz piano" -p 20 --min-views 50000 --min-like-ratio 200 --top 10
 ```
 
 ### JSON output (for scripting)
 
 ```bash
-python -m ytscraper -c "lo-fi beats" -p 5 --top 2 --json
+ytscraper -c "lo-fi beats" -p 5 --top 2 --json
 ```
 
 ```json
@@ -171,7 +135,7 @@ python -m pytest -v
 ```
 ytscraper/
 ├── __init__.py
-├── __main__.py      # python -m ytscraper entry point
+├── __main__.py      # ytscraper entry point
 ├── cli.py           # argument parsing + output formatting
 ├── search.py        # yt-dlp search wrapper
 ├── metadata.py      # concurrent metadata + dislike API fetch
