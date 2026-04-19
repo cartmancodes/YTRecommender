@@ -124,7 +124,7 @@ The score rewards videos that are both well-liked relative to dislikes *and* hav
 ## Running tests
 
 ```bash
-pip install pytest          # already in requirements.txt
+pip install -e ".[dev]"     # installs pytest via pyproject.toml dev extras
 python -m pytest -v
 ```
 
