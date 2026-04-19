@@ -5,6 +5,7 @@ from ytscraper.models import VideoRef
 def search(query: str, limit: int = 10) -> list[VideoRef]:
     ydl_opts = {
         "quiet": True,
+        "no_warnings": True,
         "extract_flat": True,
         "skip_download": True,
     }

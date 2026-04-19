@@ -21,7 +21,7 @@ def fetch(refs: list[VideoRef]) -> list[VideoMetadata]:
 
 
 def _fetch_one(ref: VideoRef) -> VideoMetadata | None:
-    ydl_opts = {"quiet": True, "skip_download": True}
+    ydl_opts = {"quiet": True, "no_warnings": True, "skip_download": True}
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(ref.url, download=False)
