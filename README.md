@@ -9,8 +9,16 @@ Fetch and rank YouTube videos by quality — filtered by views and like/dislike 
 ## Setup
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
+
+> **Optional — suppress yt-dlp JS runtime warnings:** yt-dlp will warn that no JavaScript runtime is installed. The scraper works without one, but to silence the warning install [Deno](https://deno.com/):
+> ```bash
+> brew install deno   # macOS
+> # or: curl -fsSL https://deno.land/install.sh | sh
+> ```
 
 ## Usage
 
@@ -30,16 +38,36 @@ python -m ytscraper -c "chill indie playlist" -p 20
 ## Example
 
 ```bash
-python -m ytscraper -c "lo-fi beats" -p 15 --top 5
+python -m ytscraper -c "chill indie playlist" -p 5 --top 5
 ```
 
 ```
  #  Score   Views    Likes   Dislikes  Title                               URL
- 1  0.521   2.1M     180K    210       Lo-Fi Study Beats 2025              https://www.youtube.com/watch?v=...
- 2  0.418   890K     72K     95        Chill Lofi Radio                    https://www.youtube.com/watch?v=...
+ 1  3.052   5.6M     135K    1K        late night vibes | escape reality p https://www.youtube.com/watch?v=ObVsY50NMkQ
+ 2  2.579   1.5M     30K     219       everything is going to be alright [ https://www.youtube.com/watch?v=tastBJdz8KY
 ```
 
 A `*` after the Dislikes value means the Return YouTube Dislike API was unavailable for that video; the like/dislike ratio filter is skipped for those entries.
+
+## JSON output
+
+```bash
+python -m ytscraper -c "chill indie playlist" -p 5 --top 3 --json
+```
+
+```json
+[
+  {
+    "url": "https://www.youtube.com/watch?v=ObVsY50NMkQ",
+    "title": "late night vibes | escape reality playlist",
+    "views": 5600000,
+    "likes": 135000,
+    "dislikes": 1000,
+    "dislikes_available": true,
+    "score": 3.0518
+  }
+]
+```
 
 ## Quality Parameters
 
