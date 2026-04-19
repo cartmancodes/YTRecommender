@@ -1,78 +1,168 @@
 # YTscraper
 
-Fetch and rank YouTube videos by quality — filtered by views and like/dislike ratio, sorted by a quality score.
+> Fetch and rank YouTube videos by quality — filtered by views and like/dislike ratio, sorted by a composite quality score.
 
 **Requires Python 3.11+**
 
-> Dislike counts are sourced from the [Return YouTube Dislike API](https://returnyoutubedislikeapi.com/), a community-maintained service. They are estimates, not the original YouTube counts (YouTube removed public dislike counts in November 2021).
+---
+
+## How it works
+
+1. Searches YouTube for candidate videos using [`yt-dlp`](https://github.com/yt-dlp/yt-dlp)
+2. Fetches per-video metadata (views, likes) concurrently via `yt-dlp`
+3. Fetches dislike counts from the [Return YouTube Dislike API](https://returnyoutubedislikeapi.com/) *(YouTube removed public dislike counts in November 2021)*
+4. Filters by minimum views and like/dislike ratio
+5. Ranks by quality score: `(likes / max(dislikes, 1)) × (likes / max(views, 1))`
+
+---
 
 ## Setup
 
+### 1. Create a virtual environment
+
 ```bash
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate        # macOS / Linux
+# .venv\Scripts\activate         # Windows
+```
+
+### 2. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-> **Optional — suppress yt-dlp JS runtime warnings:** yt-dlp will warn that no JavaScript runtime is installed. The scraper works without one, but to silence the warning install [Deno](https://deno.com/):
-> ```bash
-> brew install deno   # macOS
-> # or: curl -fsSL https://deno.land/install.sh | sh
-> ```
+### 3. (Optional) Suppress JS runtime warnings
+
+`yt-dlp` will warn if no JavaScript runtime is installed. The scraper works fine without one, but to silence the warning install [Deno](https://deno.com/):
+
+```bash
+# macOS
+brew install deno
+
+# Linux / macOS (curl)
+curl -fsSL https://deno.land/install.sh | sh
+```
+
+---
 
 ## Usage
+
+```bash
+python -m ytscraper -c "<search query>" [options]
+```
+
+### Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-c`, `--content` | **required** | Search query |
+| `-p`, `--pages` | `10` | Number of candidate videos to fetch from search |
+| `--min-views` | `10000` | Minimum view count to include a video |
+| `--min-like-ratio` | `100` | Minimum likes-to-dislikes ratio (skipped if dislikes unavailable) |
+| `--top` | all | Limit the number of results shown |
+| `--json` | off | Output results as a JSON array instead of a table |
+| `-h`, `--help` | | Show help and exit |
+
+---
+
+## Examples
+
+### Basic search
 
 ```bash
 python -m ytscraper -c "chill indie playlist" -p 20
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-c`, `--content` | required | Search query |
-| `-p`, `--pages` | `10` | Number of candidates to search |
-| `--min-views` | `10000` | Minimum view count |
-| `--min-like-ratio` | `100` | Minimum likes/dislikes ratio |
-| `--top` | all | Limit number of results shown |
-| `--json` | off | Output as JSON instead of table |
-
-## Example
+### Limit results
 
 ```bash
-python -m ytscraper -c "chill indie playlist" -p 5 --top 5
+python -m ytscraper -c "lo-fi beats" -p 15 --top 5
 ```
 
 ```
  #  Score   Views    Likes   Dislikes  Title                               URL
- 1  3.052   5.6M     135K    1K        late night vibes | escape reality p https://www.youtube.com/watch?v=ObVsY50NMkQ
- 2  2.579   1.5M     30K     219       everything is going to be alright [ https://www.youtube.com/watch?v=tastBJdz8KY
+ 1  1.873   54.1M    484K    2K        Best of lofi hip hop 2021 ✨ [beats  https://www.youtube.com/watch?v=n61ULEU7CO0
+ 2  1.599   132.2M   2.1M    21K       1 A.M Study Session 📚 [lofi hip hop https://www.youtube.com/watch?v=lTRiuFIWV54
+ 3  1.243   643.2M   3.5M    15K       lofi hip hop radio 📚 beats to relax https://www.youtube.com/watch?v=jfKfPfyJRdk
 ```
 
-A `*` after the Dislikes value means the Return YouTube Dislike API was unavailable for that video; the like/dislike ratio filter is skipped for those entries.
+> A `*` after the Dislikes count means the Return YouTube Dislike API was unavailable for that video; the like/dislike ratio filter is skipped for those entries.
 
-## JSON output
+### Custom quality thresholds
 
 ```bash
-python -m ytscraper -c "chill indie playlist" -p 5 --top 3 --json
+python -m ytscraper -c "jazz piano" -p 20 --min-views 50000 --min-like-ratio 200 --top 10
+```
+
+### JSON output (for scripting)
+
+```bash
+python -m ytscraper -c "lo-fi beats" -p 5 --top 2 --json
 ```
 
 ```json
 [
   {
-    "url": "https://www.youtube.com/watch?v=ObVsY50NMkQ",
-    "title": "late night vibes | escape reality playlist",
-    "views": 5600000,
-    "likes": 135000,
-    "dislikes": 1000,
+    "url": "https://www.youtube.com/watch?v=n61ULEU7CO0",
+    "title": "Best of lofi hip hop 2021 ✨ [beats to relax/study to]",
+    "views": 54125467,
+    "likes": 483772,
+    "dislikes": 2308,
     "dislikes_available": true,
-    "score": 3.0518
+    "score": 1.8735
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=lTRiuFIWV54",
+    "title": "1 A.M Study Session 📚 [lofi hip hop]",
+    "views": 132205507,
+    "likes": 2111252,
+    "dislikes": 21082,
+    "dislikes_available": true,
+    "score": 1.5993
   }
 ]
 ```
 
-## Quality Parameters
+---
 
-| Parameter | Default |
-|-----------|---------|
-| Minimum views | 10,000 |
-| Minimum likes/dislikes ratio | 100 |
-| Ranking score | `(likes / max(dislikes,1)) × (likes / max(views,1))` |
+## Quality scoring
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Minimum views | 10,000 | Hard floor — videos below this are excluded |
+| Minimum like/dislike ratio | 100 | Hard floor — excluded when `likes / dislikes < ratio` |
+| Ranking score | `(likes / max(dislikes,1)) × (likes / max(views,1))` | Higher is better |
+
+The score rewards videos that are both well-liked relative to dislikes *and* have strong engagement relative to total views.
+
+---
+
+## Running tests
+
+```bash
+pip install pytest          # already in requirements.txt
+python -m pytest -v
+```
+
+---
+
+## Project structure
+
+```
+ytscraper/
+├── __init__.py
+├── __main__.py      # python -m ytscraper entry point
+├── cli.py           # argument parsing + output formatting
+├── search.py        # yt-dlp search wrapper
+├── metadata.py      # concurrent metadata + dislike API fetch
+├── ranking.py       # filter and rank by quality score
+└── models.py        # VideoRef, VideoMetadata, ScoredVideo dataclasses
+
+tests/
+├── test_models.py
+├── test_ranking.py
+├── test_search.py
+├── test_metadata.py
+└── test_cli.py
+```
