@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ytscraper"
+version = "1.0.0"
+description = "Fetch and rank YouTube videos by quality using likes, dislikes, and views"
+requires-python = ">=3.11"
+dependencies = [
+    "yt-dlp",
+    "httpx",
+]
+
+[project.scripts]
+ytscraper = "ytscraper.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ytscraper*"]
