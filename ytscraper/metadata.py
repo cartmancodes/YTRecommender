@@ -34,11 +34,11 @@ def _fetch_one(ref: VideoRef) -> VideoMetadata | None:
     return VideoMetadata(
         id=ref.id,
         url=ref.url,
-        title=info.get("title", ref.title),
-        channel=info.get("channel", ""),
-        duration=info.get("duration", 0),
-        views=info.get("view_count", 0),
-        likes=info.get("like_count", 0),
+        title=info.get("title") or ref.title,
+        channel=info.get("channel") or "",
+        duration=info.get("duration") or 0,
+        views=info.get("view_count") or 0,
+        likes=info.get("like_count") or 0,
         dislikes=dislikes,
         dislikes_available=dislikes_available,
     )

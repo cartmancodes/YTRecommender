@@ -82,6 +82,26 @@ def test_ytdlp_failure_only_excludes_failing_video():
     assert results[0].id == "def456"
 
 
+def test_none_metadata_fields_coerced_to_defaults():
+    info = {
+        "title": None,
+        "channel": None,
+        "duration": None,
+        "view_count": None,
+        "like_count": None,
+    }
+    with patch("yt_dlp.YoutubeDL", return_value=_make_ydl_mock(info=info)):
+        with patch("httpx.get", return_value=_ok_dislike_response(150)):
+            results = metadata_module.fetch([_REF_A])
+    assert len(results) == 1
+    m = results[0]
+    assert m.title == "Test A"
+    assert m.channel == ""
+    assert m.duration == 0
+    assert m.views == 0
+    assert m.likes == 0
+
+
 def test_dislike_api_called_with_correct_video_id():
     with patch("yt_dlp.YoutubeDL", return_value=_make_ydl_mock()):
         with patch("httpx.get", return_value=_ok_dislike_response()) as mock_get:
