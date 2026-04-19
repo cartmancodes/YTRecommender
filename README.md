@@ -32,18 +32,6 @@ source .venv/bin/activate        # macOS / Linux
 pip install -r requirements.txt
 ```
 
-### 3. (Optional) Suppress JS runtime warnings
-
-`yt-dlp` will warn if no JavaScript runtime is installed. The scraper works fine without one, but to silence the warning install [Deno](https://deno.com/):
-
-```bash
-# macOS
-brew install deno
-
-# Linux / macOS (curl)
-curl -fsSL https://deno.land/install.sh | sh
-```
-
 ---
 
 ## Usage
