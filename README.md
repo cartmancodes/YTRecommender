@@ -39,12 +39,17 @@ ytscraper -c "<search query>" [options]
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-c`, `--content` | **required** | Search query |
+| `-c`, `--content` | required for search | Search query (omit when using `--url`) |
 | `-p`, `--pages` | `10` | Number of candidate videos to fetch from search |
 | `--min-views` | `10000` | Minimum view count to include a video |
 | `--min-like-ratio` | `100` | Minimum likes-to-dislikes ratio (skipped if dislikes unavailable) |
 | `--top` | all | Limit the number of results shown |
 | `--json` | off | Output results as a JSON array instead of a table |
+| `--download` | off | Download each ranked result after the search |
+| `--url` | — | Download a specific YouTube URL directly (bypasses search) |
+| `--format` | `mp3` | Output format: `mp3`, `m4a`, `opus`, `wav`, `flac`, `aac`, `vorbis`, `mp4`, `webm`, `mkv`, `best` |
+| `--output-dir` | `./downloads` | Directory to save downloaded files |
+| `--audio-quality` | `192` | Audio bitrate in kbps for lossy audio formats |
 | `-h`, `--help` | | Show help and exit |
 
 ---
@@ -77,6 +82,22 @@ ytscraper -c "lo-fi beats" -p 15 --top 5
 ```bash
 ytscraper -c "jazz piano" -p 20 --min-views 50000 --min-like-ratio 200 --top 10
 ```
+
+### Download a specific link as MP3
+
+```bash
+ytscraper --url "https://www.youtube.com/watch?v=dQw4w9WgXcQ" --format mp3
+```
+
+Saved to `./downloads/<video title>.mp3`. Audio formats (`mp3`, `m4a`, `wav`, `flac`, `aac`, `vorbis`) require [`ffmpeg`](https://ffmpeg.org/) on your `PATH` — install with `brew install ffmpeg` on macOS or `sudo apt install ffmpeg` on Debian/Ubuntu. `opus`, `webm`, `mkv`, `mp4`, and `best` typically work without conversion.
+
+### Download top results from a search
+
+```bash
+ytscraper -c "lo-fi beats" -p 10 --top 3 --download --format opus --output-dir ~/Music/lofi
+```
+
+All formats listed are free to play on macOS and Linux: native players (QuickTime, GNOME Videos) cover `mp3`/`m4a`/`mp4`, and [VLC](https://www.videolan.org/) or [mpv](https://mpv.io/) handle the rest.
 
 ### JSON output (for scripting)
 
@@ -140,6 +161,7 @@ ytscraper/
 ├── search.py        # yt-dlp search wrapper
 ├── metadata.py      # concurrent metadata + dislike API fetch
 ├── ranking.py       # filter and rank by quality score
+├── download.py      # yt-dlp download in audio/video formats
 └── models.py        # VideoRef, VideoMetadata, ScoredVideo dataclasses
 
 tests/
@@ -147,5 +169,6 @@ tests/
 ├── test_ranking.py
 ├── test_search.py
 ├── test_metadata.py
+├── test_download.py
 └── test_cli.py
 ```
